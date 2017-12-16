@@ -26,20 +26,22 @@ My second go with CUDA library, this time RSA
 
    testing the key ;)
    
-   encrypting and decrypting is using multi threading on openmp, though, it's still bit-limited, a big integer will result in 
-   miscalculated results (this is not python!)
-   
+   encrypting and decrypting is using multi threading on openmp
+
+Limited to long long size -> 8 bytes (64 bits) meaning 2^63 (signed unsigned bit required)   
+real RSA is 4096 bits (512 bytes)
+
 # Example of a run:
 
-p = 101, q = 113
-n = 11413, phi(n) = 11200
-d = 2577, e = 113
+p = 499, q = 523
+n = 260977, phi(n) = 259956
+d = 124759, e = 523
 
- Message: 386
+ Message: 2159
 
- Encrypted Message: 8861
+ Encrypted Message: 189393
 
- Decrypted Message: 386
+ Decrypted Message: 2159
 Press any key to continue . . .
 
 

@@ -4,21 +4,22 @@
 
 int main()
 {
+	
 	init_GPU_limits();
 	init_list_prime();
 	//printf("threads_max = %d, blocks_per_thread=%d\n", threads_max, blocks_per_thread);
 	
 	RSA* key = get_rsa();
 	
-	long message = random_num(RANDOM_NUM_MAX);
-	printf("\n Message: %ld\n", message);
+	long long message = random_num(RANDOM_NUM_MAX);
+	printf("\n Message: %lli\n", message);
 
 	
-	long encrypted_message = encrypt(key,message);
-	printf("\n Encrypted Message: %ld\n", encrypted_message);
+	long long encrypted_message = encrypt(key,message);
+	printf("\n Encrypted Message: %lli\n", encrypted_message);
 	
-	long decrypted_message = decrypt(key, encrypted_message);
-	printf("\n Decrypted Message: %ld\n", decrypted_message);
+	long long decrypted_message = decrypt(key, encrypted_message);
+	printf("\n Decrypted Message: %lli\n", decrypted_message);
 	
 	free(key);
 	free(list_prime);
@@ -32,28 +33,28 @@ int main()
 RSA* get_rsa()
 {
 	RSA* rsa = (RSA*)calloc(1,sizeof(RSA));
-	unsigned int p = get_prime();
-	unsigned int q = get_prime();
+	long long p = get_prime();
+	long long q = get_prime();
 	while (p == q)
 		q = get_prime(); // ensures p and q to be different prime numbers
-	unsigned int n = p * q;
+	long long n = p * q;
 	rsa->n = n;
-	unsigned int phi_n = (p - 1)*(q - 1);
-	printf("p = %u, q = %u\nn = %u, phi(n) = %u\n", p, q, n, phi_n); 
-	unsigned e = get_prime(phi_n);
-	unsigned int x, y;
+	long long phi_n = (p - 1)*(q - 1);
+	printf("p = %lli, q = %lli\nn = %lli, phi(n) = %lli\n", p, q, n, phi_n); 
+	long long e = get_prime(phi_n);
+	long long x, y;
 	gcdExtended(phi_n, e, &x, &y);
-	unsigned int d = y;
-	printf("d = %u, e = %u\n", d,e);
+	long long d = y;
+	printf("d = %lli, e = %lli\n", d,e);
 	rsa->d = d;
 	rsa->e = e;
 	return rsa;
 }
 
-__global__ void init_is_prime_list(unsigned int* num, unsigned int i, unsigned int j, int threads_count, int blocks_count)
+__global__ void init_is_prime_list(long long* num, long long i, long long j, int threads_count, int blocks_count)
 {
-	unsigned int num_to_check = (threadIdx.x)+threads_count*i;
-	unsigned int divisor = (blockIdx.x) + blocks_count*j;
+	long long num_to_check = (threadIdx.x)+threads_count*i;
+	long long divisor = (blockIdx.x) + blocks_count*j;
 	if (num_to_check <= 1 || divisor <= 1 || num_to_check <= divisor )
 		return;
 	if (num_to_check%divisor == 0)
@@ -67,18 +68,18 @@ __global__ void init_is_prime_list(unsigned int* num, unsigned int i, unsigned i
 */
 void init_list_prime()
 {
-	list_prime = (unsigned int*) calloc(RANDOM_NUM_MAX, sizeof(unsigned int));
+	list_prime = (long long*) calloc(RANDOM_NUM_MAX, sizeof(long long));
 
-	unsigned int *host_list_prime = NULL,*device_list_prime=NULL; // init data
-	unsigned int i,j;
+	long long *host_list_prime = NULL,*device_list_prime=NULL; // init data
+	long long i,j;
 
-	cudaMallocHost((void**)&host_list_prime, sizeof(unsigned int)*RANDOM_NUM_MAX); // malloc 
+	cudaMallocHost((void**)&host_list_prime, sizeof(long long)*RANDOM_NUM_MAX); // malloc 
 
 	for (i = 0; i < RANDOM_NUM_MAX; i++)
 		host_list_prime[i] = list_prime[i]; // copy to host pointer bridge
 
-	cudaMalloc((void**)&device_list_prime, sizeof(unsigned int)*RANDOM_NUM_MAX); // alloc device pointer
-	cudaMemcpy(device_list_prime, host_list_prime, sizeof(unsigned int)*RANDOM_NUM_MAX, cudaMemcpyHostToDevice); // copy to device pointer
+	cudaMalloc((void**)&device_list_prime, sizeof(long long)*RANDOM_NUM_MAX); // alloc device pointer
+	cudaMemcpy(device_list_prime, host_list_prime, sizeof(long long)*RANDOM_NUM_MAX, cudaMemcpyHostToDevice); // copy to device pointer
 	for (i = 0; i*threads_max <= RANDOM_NUM_MAX; i++)
 	{
 		for (j = 0; j*blocks_per_thread <= RANDOM_NUM_MAX; j++)
@@ -92,9 +93,9 @@ void init_list_prime()
 
 	cudaDeviceSynchronize();
 
-	cudaMemcpy(host_list_prime, device_list_prime, sizeof(unsigned int)*RANDOM_NUM_MAX, cudaMemcpyDeviceToHost);
+	cudaMemcpy(host_list_prime, device_list_prime, sizeof(long long)*RANDOM_NUM_MAX, cudaMemcpyDeviceToHost);
 	// copy back only prime numbers
-	unsigned int size = 0; // count amount of elements which are prime
+	long size = 0; // count amount of elements which are prime
 	for (i = 1; i < RANDOM_NUM_MAX; i++)
 	{
 		if (host_list_prime[i] == 0) // if element is prime
@@ -102,7 +103,7 @@ void init_list_prime()
 	}
 
 	free(list_prime); // free current arr, it was big to bench the system for big memory/max memory usage
-	list_prime = (unsigned int*)calloc(size, sizeof(unsigned int)); // allocates new array to hold list of prime numbers 
+	list_prime = (long long*)calloc(size, sizeof(long long)); // allocates new array to hold list of prime numbers 
 	
 	cudaDeviceSynchronize();
 
@@ -147,9 +148,9 @@ void init_GPU_limits()
 /*
   o(1)
 */
-unsigned int random_num(unsigned int max)
+long long random_num(long long max)
 {
-	srand((unsigned int)time(NULL));
+	srand((long)time(NULL));
 	return (rand() % max) + 1;
 }
 
@@ -157,18 +158,18 @@ unsigned int random_num(unsigned int max)
 /*
 	o(1)
 */
-unsigned int get_prime()
+long long get_prime()
 {
-	unsigned int num = random_num(list_prime_size);
+	long long num = random_num(list_prime_size);
 	return list_prime[num];
 }
 
 /*
 	o(?) -- chooses random, depends how good seed is
 */
-unsigned int get_prime(unsigned int max)
+long long get_prime(long long max)
 {
-	unsigned int prime;
+	long long prime;
 	while ((prime = get_prime()) >= max);
 	return prime;
 }
@@ -176,7 +177,7 @@ unsigned int get_prime(unsigned int max)
 /*
 	o( log(a*b) ) ..
 */
-unsigned int gcdExtended(unsigned int a, unsigned int b, unsigned int *x, unsigned int *y)
+long long gcdExtended(long long a, long long b, long long *x, long long *y)
 {
 	// Base Case
 	if (a == 0)
@@ -186,8 +187,8 @@ unsigned int gcdExtended(unsigned int a, unsigned int b, unsigned int *x, unsign
 		return b;
 	}
 
-	unsigned int x1, y1; // To store results of recursive call
-	int gcd = gcdExtended(b%a, a, &x1, &y1);
+	long long x1, y1; // To store results of recursive call
+	long long gcd = gcdExtended(b%a, a, &x1, &y1);
 
 	// Update x and y using results of recursive
 	// call
@@ -197,31 +198,31 @@ unsigned int gcdExtended(unsigned int a, unsigned int b, unsigned int *x, unsign
 	return gcd;
 }
 
-long encrypt(RSA* key, long message)
+long long encrypt(RSA* key, long long message)
 {
 	if (key == NULL)
 		return 0;
-	return  m_pow_p_mod_n(message,(long) key->e,key->n);
+	return  m_pow_p_mod_n(message, key->e,key->n);
 }
 
-long decrypt(RSA* key, long crypted_message)
+long long decrypt(RSA* key, long long crypted_message)
 {
 	if (key == NULL)
 		return 0;
-	return m_pow_p_mod_n(crypted_message,(long) key->d,key->n);
+	return m_pow_p_mod_n(crypted_message, key->d,key->n);
 }
 
 /*
 	openMP multi threadded pow... hope this works
 */
-long int m_pow_p_mod_n(long m, long p, unsigned int n)
+long long int m_pow_p_mod_n(long long m, long long p, long long n)
 {
-	long res = 1;
-	int trds = (omp_get_num_procs() > p ) ? p : omp_get_num_procs();
+	long long res = 1;
+	long long trds = (omp_get_num_procs() > p ) ? p : omp_get_num_procs();
 	#pragma omp parallel for num_threads(trds)
-	for (register unsigned int i = 0; i < p; i++)
+	for (register long i = 0; i < p; i++)
 	{
-		res *= m;
+		res = (long long) m * res;
 		res = res % n;
 	}
 	return res;
