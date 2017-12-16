@@ -1,6 +1,6 @@
 Identity=kernel.cu
-AdditionalCompilerOptions=
-AdditionalCompilerOptions=
+AdditionalCompilerOptions=/openmp
+AdditionalCompilerOptions=/openmp
 AdditionalDependencies=
 AdditionalDeps=
 AdditionalLibraryDirectories=

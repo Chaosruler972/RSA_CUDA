@@ -8,7 +8,7 @@
 #include <omp.h>
 
 // 2^16.... n = 2^(16^2) at max, so 2^32
-long long RANDOM_NUM_MAX = 100000;
+long long RANDOM_NUM_MAX = 65535;
 
 typedef struct RSA
 {

@@ -98,8 +98,9 @@ void init_list_prime()
 	long long trds = (omp_get_num_procs() > RANDOM_NUM_MAX) ? RANDOM_NUM_MAX : omp_get_num_procs();
 	#pragma omp parallel for num_threads(trds)
 	for (register long long j = 0; j < RANDOM_NUM_MAX; j++)
+	{
 		host_list_prime[j] = list_prime[j]; // copy to host pointer bridge
-
+	}
 	cudaMalloc((void**)&device_list_prime, sizeof(long long)*RANDOM_NUM_MAX); // alloc device pointer
 	cudaMemcpy(device_list_prime, host_list_prime, sizeof(long long)*RANDOM_NUM_MAX, cudaMemcpyHostToDevice); // copy to device pointer
 	for (i = 0; i*threads_max <= RANDOM_NUM_MAX; i++)
@@ -242,9 +243,7 @@ long long decrypt(RSA* key, long long crypted_message)
 long long int m_pow_p_mod_n(long long m, long long p, long long n)
 {
 	long long res = 1;
-	long long trds = (omp_get_num_procs() > p ) ? p : omp_get_num_procs();
-	#pragma omp parallel for num_threads(trds)
-	for (register long long i = 0; i < p; i++)
+	for (long long i = 0; i < p; i++)
 	{
 		res = (long long) m * res;
 		res = res % n;

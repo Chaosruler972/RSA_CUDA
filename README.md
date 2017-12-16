@@ -38,29 +38,29 @@ CUDA satistics
 
 
 Done with creating prime numbers list
- the numbers I was searching was between 0 and 200
- and I found 47 prime numbers
+ the numbers I was searching was between 0 and 1000
+ and I found 118 prime numbers
 
 
 RSA key data:
-p = 41, q = 53
-n = 2173, phi(n) = 2080
-d = 157, e = 53
+p = 151, q = 173
+n = 26123, phi(n) = 25800
+d = 2237, e = 173
 
 
 Encryption data:
 
- Message: 145
+ Message: 668
 
- Encrypted Message: 887
+ Encrypted Message: 21601
 
 
 Decryption data:
 
- Decrypted Message: 145, Message was 145
+ Decrypted Message: 668, Message was 668
 
 
-Entire operation of searching 47 prime numbers between 0 and 200
+Entire operation of searching 118 prime numbers between 0 and 1000
 And generating RSA key
 And encrypting
 And decrypting
@@ -68,7 +68,44 @@ Took 1.000000 seconds
 Press any key to continue . . .
 
 
-# Example of a run on medium input:
+
+
+CUDA satistics
+ Amount of blocks = 1024, Threads per block =1024
+
+
+Done with creating prime numbers list
+ the numbers I was searching was between 0 and 10000
+ and I found 216 prime numbers
+
+
+RSA key data:
+p = 1973, q = 1997
+n = 3940081, phi(n) = 3936112
+d = 1259477, e = 1997
+
+
+Encryption data:
+
+ Message: 1802
+
+ Encrypted Message: 249430
+
+
+Decryption data:
+
+ Decrypted Message: 1802, Message was 1802
+
+
+Entire operation of searching 216 prime numbers between 0 and 10000
+And generating RSA key
+And encrypting
+And decrypting
+Took 4.000000 seconds
+Press any key to continue . . .
+
+
+
 
 CUDA satistics
  Amount of blocks = 1024, Threads per block =1024
@@ -76,69 +113,32 @@ CUDA satistics
 
 Done with creating prime numbers list
  the numbers I was searching was between 0 and 65535
- and I found 6543 prime numbers
+ and I found 1140 prime numbers
 
 
 RSA key data:
-p = 19477, q = 19501
-n = 379820977, phi(n) = 379782000
-d = 15190501, e = 19501
+p = 38261, q = 21407
+n = 819053227, phi(n) = 818993560
+d = 383959423, e = 21407
 
 
 Encryption data:
 
- Message: 28385
+ Message: 12004
 
- Encrypted Message: 219707150
-
-
-Decryption data:
-
- Decrypted Message: 28385, Message was 28385
-
-
-Entire operation of searching 6543 prime numbers between 0 and 65535
-And generating RSA key
-And encrypting
-And decrypting
-Took 19.000000 seconds
-Press any key to continue . . .
-
-# Example of a run on big input:
-
-CUDA satistics
- Amount of blocks = 1024, Threads per block =1024
-
-
-Done with creating prime numbers list
- the numbers I was searching was between 0 and 100000
- and I found 9593 prime numbers
-
-
-RSA key data:
-p = 60527, q = 60601
-n = 3667996727, phi(n) = 3667875600
-d = 48904201, e = 60601
-
-
-Encryption data:
-
- Message: 6106
-
- Encrypted Message: 2453195187
+ Encrypted Message: 595019569
 
 
 Decryption data:
 
- Decrypted Message: 6106, Message was 6106
+ Decrypted Message: 12004, Message was 12004
 
 
-Entire operation of searching 9593 prime numbers between 0 and 100000
+Entire operation of searching 1140 prime numbers between 0 and 65535
 And generating RSA key
 And encrypting
 And decrypting
-Took 44.000000 seconds
+Took 25.000000 seconds
 Press any key to continue . . .
-
 
 
