@@ -7,6 +7,9 @@
 #include <time.h>
 #include <omp.h>
 
+// 2^16.... n = 2^(16^2) at max, so 2^32
+long long RANDOM_NUM_MAX = 100000;
+
 typedef struct RSA
 {
 	long long n;
@@ -23,8 +26,7 @@ long long int m_pow_p_mod_n(long long m, long long p, long long n);
 
 
 long long random_num(long long max); // random number between 0 and max
-// 2^16.... n = 2^(16^2) at max, so 2^32
-#define RANDOM_NUM_MAX 5000 
+
 
 long long get_prime(); // random prime number
 

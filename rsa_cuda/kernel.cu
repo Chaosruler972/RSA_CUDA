@@ -4,13 +4,17 @@
 
 int main()
 {
-	
+	clock_t start = clock();
 	init_GPU_limits();
+	printf("CUDA satistics\n Amount of blocks = %d, Threads per block =%d\n", threads_max, blocks_per_thread);
+
 	init_list_prime();
-	//printf("threads_max = %d, blocks_per_thread=%d\n", threads_max, blocks_per_thread);
-	
+	printf("\n\nDone with creating prime numbers list\n the numbers I was searching was between %d and %lli\n and I found %lli prime numbers\n\n",0,RANDOM_NUM_MAX,list_prime_size);
+
+	printf("\nRSA key data:\n");
 	RSA* key = get_rsa();
 	
+	printf("\n\nEncryption data: \n");
 	long long message = random_num(RANDOM_NUM_MAX);
 	printf("\n Message: %lli\n", message);
 
@@ -18,11 +22,18 @@ int main()
 	long long encrypted_message = encrypt(key,message);
 	printf("\n Encrypted Message: %lli\n", encrypted_message);
 	
+	printf("\n\nDecryption data: \n");
+
 	long long decrypted_message = decrypt(key, encrypted_message);
-	printf("\n Decrypted Message: %lli\n", decrypted_message);
+	printf("\n Decrypted Message: %lli, Message was %lli\n", decrypted_message,message);
 	
 	free(key);
 	free(list_prime);
+	clock_t end = clock();
+
+	double time_in_sec = (end - start) / CLOCKS_PER_SEC;
+
+	printf("\n\nEntire operation of searching %lli prime numbers between %d and %lli\nAnd generating RSA key\nAnd encrypting\nAnd decrypting\nTook %f seconds\n", list_prime_size, 0, RANDOM_NUM_MAX, time_in_sec);
 	return 0;
 }
 
@@ -40,15 +51,24 @@ RSA* get_rsa()
 	long long n = p * q;
 	rsa->n = n;
 	long long phi_n = (p - 1)*(q - 1);
-	printf("p = %lli, q = %lli\nn = %lli, phi(n) = %lli\n", p, q, n, phi_n); 
+	
 	long long e = get_prime(phi_n);
 	long long x, y;
-	gcdExtended(phi_n, e, &x, &y);
+	gcdExtended(phi_n, e,&x,&y);
 	long long d = y;
-	printf("d = %lli, e = %lli\n", d,e);
 	rsa->d = d;
 	rsa->e = e;
-	return rsa;
+	if (rsa->d <= 0 || rsa->e <= 0 || rsa->n <= 0) // GCD euclid...
+	{
+		free(rsa);
+		return get_rsa();
+	}
+	else
+	{
+		printf("p = %lli, q = %lli\nn = %lli, phi(n) = %lli\n", p, q, n, phi_n);
+		printf("d = %lli, e = %lli\n", d, e);
+		return rsa;
+	}
 }
 
 __global__ void init_is_prime_list(long long* num, long long i, long long j, int threads_count, int blocks_count)
@@ -75,8 +95,10 @@ void init_list_prime()
 
 	cudaMallocHost((void**)&host_list_prime, sizeof(long long)*RANDOM_NUM_MAX); // malloc 
 
-	for (i = 0; i < RANDOM_NUM_MAX; i++)
-		host_list_prime[i] = list_prime[i]; // copy to host pointer bridge
+	long long trds = (omp_get_num_procs() > RANDOM_NUM_MAX) ? RANDOM_NUM_MAX : omp_get_num_procs();
+	#pragma omp parallel for num_threads(trds)
+	for (register long long j = 0; j < RANDOM_NUM_MAX; j++)
+		host_list_prime[j] = list_prime[j]; // copy to host pointer bridge
 
 	cudaMalloc((void**)&device_list_prime, sizeof(long long)*RANDOM_NUM_MAX); // alloc device pointer
 	cudaMemcpy(device_list_prime, host_list_prime, sizeof(long long)*RANDOM_NUM_MAX, cudaMemcpyHostToDevice); // copy to device pointer
@@ -95,10 +117,11 @@ void init_list_prime()
 
 	cudaMemcpy(host_list_prime, device_list_prime, sizeof(long long)*RANDOM_NUM_MAX, cudaMemcpyDeviceToHost);
 	// copy back only prime numbers
-	long size = 0; // count amount of elements which are prime
-	for (i = 1; i < RANDOM_NUM_MAX; i++)
+	long long size = 0; // count amount of elements which are prime
+	#pragma omp parallel for num_threads(trds)
+	for (register long long k = 1; k < RANDOM_NUM_MAX; k++)
 	{
-		if (host_list_prime[i] == 0) // if element is prime
+		if (host_list_prime[k] == 0) // if element is prime
 			size++; // increase size
 	}
 
@@ -108,11 +131,12 @@ void init_list_prime()
 	cudaDeviceSynchronize();
 
 	size = 0; // to iterate using similar manner
-	for (i = 1; i < RANDOM_NUM_MAX; i++)
+	#pragma omp parallel for num_threads(trds)
+	for (register long long h = 1; h < RANDOM_NUM_MAX; h++)
 	{
-		if (host_list_prime[i] == 0) // if number is prime
+		if (host_list_prime[h] == 0) // if number is prime
 		{
-			list_prime[size] = i; // set it on the prime array
+			list_prime[size] = h; // set it on the prime array
 			size++; // next iteration
 		}
 	}
@@ -139,8 +163,8 @@ void init_GPU_limits()
 		if (properties.major != 9999) /* 9999 means emulation only */
 			if (device == 0)
 			{
-				threads_max = properties.maxThreadsDim[0]/2;
-				blocks_per_thread = properties.maxThreadsPerBlock/2;
+				threads_max = properties.maxThreadsDim[0];
+				blocks_per_thread = properties.maxThreadsPerBlock;
 			}
 	}
 }
@@ -220,7 +244,7 @@ long long int m_pow_p_mod_n(long long m, long long p, long long n)
 	long long res = 1;
 	long long trds = (omp_get_num_procs() > p ) ? p : omp_get_num_procs();
 	#pragma omp parallel for num_threads(trds)
-	for (register long i = 0; i < p; i++)
+	for (register long long i = 0; i < p; i++)
 	{
 		res = (long long) m * res;
 		res = res % n;
