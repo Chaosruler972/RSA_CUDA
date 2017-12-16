@@ -1,0 +1,14 @@
+﻿  
+  C:\Users\trunk\Desktop\RSA_CUDA\rsa_cuda>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.1\bin\nvcc.exe" -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64" -x cu  -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.1\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.1\include"  -G   --keep-dir x64\Debug -maxrregcount=0  --machine 64 --compile   -g   -DWIN32 -DWIN64 -D_DEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /FS /Zi /RTC1 /MDd " -o x64\Debug\kernel.cu.obj "C:\Users\trunk\Desktop\RSA_CUDA\rsa_cuda\kernel.cu" -clean 
+  kernel.cu
+  Compiling CUDA source file kernel.cu...
+  
+  C:\Users\trunk\Desktop\RSA_CUDA\rsa_cuda>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.1\bin\nvcc.exe" -gencode=arch=compute_30,code=\"sm_30,compute_30\" --use-local-env --cl-version 2015 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64" -x cu  -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.1\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.1\include"  -G   --keep-dir x64\Debug -maxrregcount=0  --machine 64 --compile -cudart static  -g   -DWIN32 -DWIN64 -D_DEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /FS /Zi /RTC1 /MDd " -o x64\Debug\kernel.cu.obj "C:\Users\trunk\Desktop\RSA_CUDA\rsa_cuda\kernel.cu" 
+  kernel.cu
+C:/Users/trunk/Desktop/RSA_CUDA/rsa_cuda/kernel.cu(222): warning C4018: '<': signed/unsigned mismatch
+  rsa_cuda.vcxproj -> C:\Users\trunk\Desktop\RSA_CUDA\rsa_cuda\x64\Debug\rsa_cuda.exe
+  rsa_cuda.vcxproj -> C:\Users\trunk\Desktop\RSA_CUDA\rsa_cuda\x64\Debug\rsa_cuda.pdb (Full PDB)
+  copy "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.1\bin\cudart*.dll" "C:\Users\trunk\Desktop\RSA_CUDA\rsa_cuda\x64\Debug\"
+  C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.1\bin\cudart32_91.dll
+  C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.1\bin\cudart64_91.dll
+          2 file(s) copied.
